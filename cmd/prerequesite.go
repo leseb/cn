@@ -2,14 +2,16 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/client"
-	"golang.org/x/net/context"
 	"log"
 	"os"
 	"os/exec"
+
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
+	"golang.org/x/net/context"
 )
 
+// DockerExist makes sure Docker is installed
 func DockerExist() {
 	cli, err := client.NewEnvClient()
 	if err != nil {
@@ -24,6 +26,8 @@ func DockerExist() {
 	}
 }
 
+// Selinux checks if Selinux is installed and set to Enforcing,
+// we relabel our WorkingDirectory to allow the container to access files in this directory
 func Selinux() {
 	if _, err := os.Stat("/sbin/getenforce"); !os.IsNotExist(err) {
 		out, err := exec.Command("getenforce").Output()

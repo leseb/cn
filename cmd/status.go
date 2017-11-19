@@ -2,13 +2,15 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 	"github.com/urfave/cli"
 	"golang.org/x/net/context"
-	"os"
 )
 
+// ContainerStatus checks container status
 func ContainerStatus() bool {
 	cli, err := client.NewEnvClient()
 	if err != nil {
@@ -27,11 +29,12 @@ func ContainerStatus() bool {
 			}
 		}
 	}
-	fmt.Println("ceph-nano is stopped!\n")
+	fmt.Println("ceph-nano is stopped!")
 	os.Exit(1)
 	return false
 }
 
+// StatusNano show Ceph Nano status
 func StatusNano(c *cli.Context) {
 	ContainerStatus()
 	EchoInfo()

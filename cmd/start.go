@@ -2,16 +2,17 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/nat"
 	"github.com/urfave/cli"
 	"golang.org/x/net/context"
-	"os"
 )
 
-// This function creates a new container when nothing exists
+// RunContainer creates a new container when nothing exists
 func RunContainer() {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
@@ -44,7 +45,7 @@ func RunContainer() {
 
 }
 
-// This function starts a container that is stopped
+// StartContainer starts a container that is stopped
 func StartContainer() {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
@@ -57,6 +58,7 @@ func StartContainer() {
 	}
 }
 
+// StartNano starts Ceph Nano
 func StartNano(c *cli.Context) {
 	if _, err := os.Stat(WorkingDirectory); os.IsNotExist(err) {
 		os.Mkdir(WorkingDirectory, 0755)

@@ -1,5 +1,6 @@
 package cmd
 
+// CreateCephNanoVolumes creates docker volumes for the container
 func CreateCephNanoVolumes() {
 	/*
 		ctx := context.Background()
@@ -22,6 +23,7 @@ func CreateCephNanoVolumes() {
 	*/
 }
 
+// RemoveCephNanoVolumes removes docker volumes
 func RemoveCephNanoVolumes() {
 	/*
 		ctx := context.Background()

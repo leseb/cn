@@ -2,11 +2,13 @@ package cmd
 
 import (
 	"fmt"
+
 	"github.com/docker/docker/client"
 	"github.com/urfave/cli"
 	"golang.org/x/net/context"
 )
 
+// RestartNano restarts the container
 func RestartNano(c *cli.Context) {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
@@ -14,7 +16,7 @@ func RestartNano(c *cli.Context) {
 		panic(err)
 	}
 
-	fmt.Println("Restarting ceph-nano \n")
+	fmt.Println("Restarting ceph-nano")
 	if err := cli.ContainerRestart(ctx, "ceph-nano", nil); err != nil {
 		panic(err)
 	}

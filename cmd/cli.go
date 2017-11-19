@@ -1,10 +1,12 @@
 package cmd
 
 import (
-	"github.com/urfave/cli"
 	"os"
+
+	"github.com/urfave/cli"
 )
 
+// NanoCli is the CLI function
 func NanoCli() {
 	app := cli.NewApp()
 	app.UsageText = "ceph-nano [FLAGS] COMMAND [arguments...]"

@@ -4,16 +4,21 @@ import (
 	"fmt"
 )
 
+// EchoInfo prints useful information about Ceph Nano
 func EchoInfo() {
 	// Always wait the container to be ready
-	WaitForContainer()
+	CephNanoHealth()
+	CephNanoS3Health()
 
 	// Fetch Amazon Keys
 	GetAwsKey()
 
+	// Get IPs
+	ips, _ := getInterfaceIPv4s()
+
 	InfoLine := "\n" +
 		"Ceph status is: $(docker exec ceph-nano ceph health) \n" +
-		"Ceph Rados Gateway address is: http://$IP:$RGW_CIVETWEB_PORT \n" +
+		"Ceph Rados Gateway address is: http://" + ips[0].String() + ":8000 \n" +
 		"Your working directory is: " +
 		WorkingDirectory +
 		"\n" +

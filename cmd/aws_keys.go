@@ -10,6 +10,7 @@ import (
 
 */
 
+// GetAwsKey gets AWS keys from inside the container
 func GetAwsKey() {
 	/*
 		ctx := context.Background()
