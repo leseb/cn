@@ -2,17 +2,18 @@ package cmd
 
 /*
 import (
+	"context"
 	"fmt"
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/client"
-	"golang.org/x/net/context"
-)
 
+	"docker.io/go-docker/api/types"
+	"github.com/docker/docker/client"
+)
 */
 
-// GetAwsKey gets AWS keys from inside the container
-func GetAwsKey() {
+// getAwsKey gets AWS keys from inside the container
+func getAwsKey() {
 	/*
+
 		ctx := context.Background()
 		cli, err := client.NewEnvClient()
 		if err != nil {
@@ -39,9 +40,8 @@ func GetAwsKey() {
 		}
 
 		defer connection.Close()
-
 		output, err := connection.Reader.ReadString('\n')
-
+		// time to parse json in go!
 		fmt.Print(output)
 	*/
 }

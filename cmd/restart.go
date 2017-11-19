@@ -8,8 +8,8 @@ import (
 	"golang.org/x/net/context"
 )
 
-// RestartNano restarts the container
-func RestartNano(c *cli.Context) {
+// restartNano restarts the container
+func restartNano(c *cli.Context) {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {

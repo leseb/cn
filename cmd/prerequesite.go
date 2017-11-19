@@ -12,7 +12,7 @@ import (
 )
 
 // DockerExist makes sure Docker is installed
-func DockerExist() {
+func dockerExist() {
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		panic(err)
@@ -28,7 +28,7 @@ func DockerExist() {
 
 // Selinux checks if Selinux is installed and set to Enforcing,
 // we relabel our WorkingDirectory to allow the container to access files in this directory
-func Selinux() {
+func selinux() {
 	if _, err := os.Stat("/sbin/getenforce"); !os.IsNotExist(err) {
 		out, err := exec.Command("getenforce").Output()
 		if err != nil {

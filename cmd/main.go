@@ -23,6 +23,6 @@ var ContainerName = "ceph-nano"
 
 // Main is the main function calling the whole program
 func Main() {
-	DockerExist()
-	NanoCli()
+	dockerExist()
+	nanoCli()
 }

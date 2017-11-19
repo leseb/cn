@@ -12,8 +12,8 @@ import (
 	"golang.org/x/net/context"
 )
 
-// RunContainer creates a new container when nothing exists
-func RunContainer() {
+// runContainer creates a new container when nothing exists
+func runContainer() {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
@@ -45,8 +45,8 @@ func RunContainer() {
 
 }
 
-// StartContainer starts a container that is stopped
-func StartContainer() {
+// startContainer starts a container that is stopped
+func startContainer() {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
@@ -58,19 +58,19 @@ func StartContainer() {
 	}
 }
 
-// StartNano starts Ceph Nano
-func StartNano(c *cli.Context) {
+// startNano starts Ceph Nano
+func startNano(c *cli.Context) {
 	if _, err := os.Stat(WorkingDirectory); os.IsNotExist(err) {
 		os.Mkdir(WorkingDirectory, 0755)
 	}
-	CreateCephNanoVolumes()
+	createCephNanoVolumes()
 
 	fmt.Println("Starting ceph-nano...")
-	StartContainer()
-	if status := ContainerStatus(); status {
-		StartContainer()
+	startContainer()
+	if status := containerStatus(); status {
+		startContainer()
 	} else {
-		RunContainer()
+		runContainer()
 	}
 	// wait for the container to be ready
 	//WaitForContainer()

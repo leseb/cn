@@ -8,8 +8,8 @@ import (
 	"golang.org/x/net/context"
 )
 
-// StopNano stops the container
-func StopNano(c *cli.Context) {
+// stopNano stops the container
+func stopNano(c *cli.Context) {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {

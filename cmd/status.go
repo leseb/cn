@@ -10,8 +10,8 @@ import (
 	"golang.org/x/net/context"
 )
 
-// ContainerStatus checks container status
-func ContainerStatus() bool {
+// containerStatus checks container status
+func containerStatus() bool {
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		panic(err)
@@ -34,8 +34,8 @@ func ContainerStatus() bool {
 	return false
 }
 
-// StatusNano show Ceph Nano status
-func StatusNano(c *cli.Context) {
-	ContainerStatus()
-	EchoInfo()
+// statusNano show Ceph Nano status
+func statusNano(c *cli.Context) {
+	containerStatus()
+	echoInfo()
 }

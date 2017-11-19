@@ -4,14 +4,14 @@ import (
 	"fmt"
 )
 
-// EchoInfo prints useful information about Ceph Nano
-func EchoInfo() {
+// echoInfo prints useful information about Ceph Nano
+func echoInfo() {
 	// Always wait the container to be ready
-	CephNanoHealth()
-	CephNanoS3Health()
+	cephNanoHealth()
+	cephNanoS3Health()
 
 	// Fetch Amazon Keys
-	GetAwsKey()
+	getAwsKey()
 
 	// Get IPs
 	ips, _ := getInterfaceIPv4s()

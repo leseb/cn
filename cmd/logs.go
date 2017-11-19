@@ -4,6 +4,6 @@ import (
 	"github.com/urfave/cli"
 )
 
-// LogsNano prints rgw logs
-func LogsNano(c *cli.Context) {
+// logsNano prints rgw logs
+func logsNano(c *cli.Context) {
 }

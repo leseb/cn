@@ -14,8 +14,8 @@ import (
 	"golang.org/x/net/context"
 )
 
-// GrepForSuccess searchs for the word 'SUCCESS' inside the container logs
-func GrepForSuccess() bool {
+// grepForSuccess searchs for the word 'SUCCESS' inside the container logs
+func grepForSuccess() bool {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
@@ -36,8 +36,8 @@ func GrepForSuccess() bool {
 	return false
 }
 
-// CephNanoHealth loops on GrepForSuccess for 30 seconds, fails after.
-func CephNanoHealth() {
+// cephNanoHealth loops on grepForSuccess for 30 seconds, fails after.
+func cephNanoHealth() {
 	// setting timeout values
 	var timeout int
 	timeout = 30
@@ -53,7 +53,7 @@ func CephNanoHealth() {
 
 	// wait for 30sec to validate that the container started properly
 	for poll < timeout {
-		if health := GrepForSuccess(); health {
+		if health := grepForSuccess(); health {
 			return
 		}
 		time.Sleep(time.Second * 1)
@@ -96,7 +96,7 @@ func curlS3() bool {
 }
 
 // CephNanoS3Health loops for 30 seconds while testing Ceph RGW heatlh
-func CephNanoS3Health() {
+func cephNanoS3Health() {
 	// setting timeout
 	var timeout int
 	timeout = 30
