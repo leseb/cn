@@ -1,47 +1,73 @@
 package cmd
 
-/*
 import (
 	"context"
-	"fmt"
+	"encoding/json"
+	"io/ioutil"
 
-	"docker.io/go-docker/api/types"
+	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 )
-*/
 
 // getAwsKey gets AWS keys from inside the container
-func getAwsKey() {
-	/*
+func getAwsKey() (string, string) {
+	ctx := context.Background()
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		panic(err)
+	}
 
-		ctx := context.Background()
-		cli, err := client.NewEnvClient()
-		if err != nil {
-			panic(err)
-		}
+	//cmd := []string{"/bin/cat", "/nano_user_details"}
+	cmd := []string{"cat", "/nano_user_details"}
 
-		cmd := []string{"/bin/cat", "/nano_user_details"}
+	optionsCreate := types.ExecConfig{
+		AttachStdout: true,
+		AttachStderr: true,
+		Cmd:          cmd,
+	}
 
-		options := types.ExecConfig{
-			AttachStdout: true,
-			AttachStderr: true,
-			Cmd:          cmd,
-		}
+	response, err := cli.ContainerExecCreate(ctx, ContainerName, optionsCreate)
+	if err != nil {
+		panic(err)
+	}
 
-		response, err := cli.ContainerExecCreate(ctx, ContainerName, options)
-		if err != nil {
-			panic(err)
-		}
+	optionsAttach := types.ExecStartCheck{
+		Detach: false,
+		Tty:    false,
+	}
+	connection, err := cli.ContainerExecAttach(ctx, response.ID, optionsAttach)
+	if err != nil {
+		panic(err)
+	}
 
-		// error: cannot use options (type types.ExecConfig) as type types.ExecStartCheck in argument to cli.ContainerExecAttach
-		connection, err := cli.ContainerExecAttach(ctx, response.ID, options)
-		if err != nil {
-			panic(err)
-		}
+	defer connection.Close()
+	//output, err := ioutil.ReadAll(connection.Reader)
+	output, err := ioutil.ReadFile("/tmp/lol")
+	if err != nil {
+		panic(err)
+	}
 
-		defer connection.Close()
-		output, err := connection.Reader.ReadString('\n')
-		// time to parse json in go!
-		fmt.Print(output)
-	*/
+	// declare structures for json
+	type s3Details []struct {
+		AccessKey string `json:"Access_key"`
+		SecretKey string `json:"Secret_key"`
+	}
+	type jason struct {
+		Keys s3Details
+	}
+	// assign variable to our json struct
+	var parsedMap jason
+
+	json.Unmarshal(output, &parsedMap)
+	if err != nil {
+		panic(err)
+	}
+
+	var CephNanoAccessKey string
+	CephNanoAccessKey = parsedMap.Keys[0].AccessKey
+	var CephNanoSecretKey string
+	CephNanoSecretKey = parsedMap.Keys[0].SecretKey
+	return CephNanoAccessKey, CephNanoSecretKey
+
+	//return "a", "b"
 }

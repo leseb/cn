@@ -11,6 +11,11 @@ import (
 	"golang.org/x/net/context"
 )
 
+// dockerApiVersion checks docker's API Version
+func dockerAPIVersion() {
+
+}
+
 // DockerExist makes sure Docker is installed
 func dockerExist() {
 	cli, err := client.NewEnvClient()

@@ -12,12 +12,6 @@ var CephNanoUID = "nano"
 // RgwPort is the rgw listenning port
 var RgwPort = "8000"
 
-// CephNanoAccessKey is the S3 access key
-var CephNanoAccessKey = "accesskey"
-
-// CephNanoSecretKey is the S3 secret key
-var CephNanoSecretKey = "secretkey"
-
 // ContainerName is name of the container
 var ContainerName = "ceph-nano"
 
