@@ -9,7 +9,7 @@ import (
 	"github.com/urfave/cli"
 )
 
-func removeContainer() {
+func removeContainer(name string) {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
@@ -23,12 +23,12 @@ func removeContainer() {
 	}
 	// we don't necessarily want to catch errors here
 	// it's not an issue if the container does not exist
-	cli.ContainerRemove(ctx, ContainerName, options)
+	cli.ContainerRemove(ctx, name, options)
 }
 
 // purgeNano purges Ceph Nano.
 func purgeNano(c *cli.Context) {
 	fmt.Println("Purging ceph-nano... ")
-	removeContainer()
+	removeContainer(ContainerName)
 	removeCephNanoVolumes()
 }

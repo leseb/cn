@@ -11,14 +11,14 @@ import (
 )
 
 // containerStatus checks container status
-func containerStatus() bool {
+func containerStatus(allList bool) bool {
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		panic(err)
 	}
 
 	listOptions := types.ContainerListOptions{
-		All:   false,
+		All:   allList,
 		Quiet: true,
 	}
 	containers, err := cli.ContainerList(context.Background(), listOptions)
@@ -38,7 +38,7 @@ func containerStatus() bool {
 
 // statusNano show Ceph Nano status
 func statusNano(c *cli.Context) {
-	if status := containerStatus(); !status {
+	if status := containerStatus(false); !status {
 		fmt.Println("ceph-nano is stopped!")
 		os.Exit(1)
 	}

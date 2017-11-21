@@ -87,7 +87,12 @@ func startNano(c *cli.Context) {
 	}
 	createCephNanoVolumes()
 
-	if status := containerStatus(); status {
+	// test for leftover container
+	if status := containerStatus(true); status {
+		removeContainer(ContainerName)
+	}
+
+	if status := containerStatus(false); status {
 		fmt.Println("ceph-nano is already running!")
 		//echoInfo()
 	} else {
