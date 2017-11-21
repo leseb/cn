@@ -40,7 +40,7 @@ func grepForSuccess() bool {
 func cephNanoHealth() {
 	// setting timeout values
 	var timeout int
-	timeout = 30
+	timeout = 60
 	var poll int
 	poll = 0
 
@@ -51,7 +51,7 @@ func cephNanoHealth() {
 		panic(err)
 	}
 
-	// wait for 30sec to validate that the container started properly
+	// wait for 60sec to validate that the container started properly
 	for poll < timeout {
 		if health := grepForSuccess(); health {
 			return

@@ -17,9 +17,10 @@ func nanoCli() {
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:  "work-dir, d",
-			Value: "" + WorkingDirectory,
-			Usage: "Only files within this `DIRECTORY` can be uploaded in Ceph Nano.",
+			Name:        "work-dir, d",
+			Value:       "" + WorkingDirectory,
+			Usage:       "Only files within this `DIRECTORY` can be uploaded in Ceph Nano.",
+			Destination: &WorkingDirectory,
 		},
 	}
 

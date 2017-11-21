@@ -39,21 +39,20 @@ func runContainer() {
 		"RGW_CIVETWEB_PORT=" + RgwPort,
 		"CEPH_DAEMON=demo"}
 
-	varlibceph := make(map[string]struct{})
-	varlibceph["/var/lib/ceph"] = struct{}{}
-	etcceph := make(map[string]struct{})
-	etcceph["/etc/ceph"] = struct{}{}
-
 	config := &container.Config{
 		Image:        imageName,
 		Hostname:     ContainerName + "-faa32aebf00b",
 		ExposedPorts: exposedPorts,
 		Env:          envs,
-		//Volumes: {"/var/lib/ceph": {varlibceph}},
+		Volumes: map[string]struct{}{
+			"/etc/ceph":     struct{}{},
+			"/var/lib/ceph": struct{}{},
+		},
 	}
 	hostConfig := &container.HostConfig{
 		PortBindings: portBindings,
 		AutoRemove:   true,
+		Binds:        []string{WorkingDirectory + ":/tmp"},
 	}
 
 	resp, err := cli.ContainerCreate(ctx, config, hostConfig, nil, ContainerName)
@@ -90,11 +89,11 @@ func startNano(c *cli.Context) {
 
 	if status := containerStatus(); status {
 		fmt.Println("ceph-nano is already running!")
-		echoInfo()
+		//echoInfo()
 	} else {
 		fmt.Println("Running ceph-nano...")
 		runContainer()
 		// wait for the container to be ready
-		echoInfo()
+		//echoInfo()
 	}
 }

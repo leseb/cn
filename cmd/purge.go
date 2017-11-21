@@ -17,8 +17,8 @@ func removeContainer() {
 	}
 
 	options := types.ContainerRemoveOptions{
-		RemoveVolumes: true,
 		RemoveLinks:   false,
+		RemoveVolumes: true,
 		Force:         true,
 	}
 	// we don't necessarily want to catch errors here

@@ -17,7 +17,7 @@ func restartNano(c *cli.Context) {
 	}
 
 	fmt.Println("Restarting ceph-nano...")
-	if err := cli.ContainerRestart(ctx, "ceph-nano", nil); err != nil {
+	if err := cli.ContainerRestart(ctx, ContainerName, nil); err != nil {
 		panic(err)
 	}
 	echoInfo()
