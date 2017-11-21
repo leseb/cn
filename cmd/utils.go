@@ -1,9 +1,14 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"sort"
+
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/client"
 )
 
 // byLastOctetValue implements sort.Interface used in sorting a list
@@ -50,4 +55,42 @@ func getInterfaceIPv4s() ([]net.IP, error) {
 	// Sort the list of IPs by their last octet value.
 	sort.Sort(sort.Reverse(byLastOctetValue(nips)))
 	return nips, nil
+}
+
+func execContainer(ContainerName string, cmd []string) []byte {
+	ctx := context.Background()
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		panic(err)
+	}
+
+	//cmd := []string{"/bin/cat", "/nano_user_details"}
+	//cmd := []string{"cat", "/var/log/ceph/client.rgw.ceph-nano-faa32aebf00b.log"}
+
+	optionsCreate := types.ExecConfig{
+		AttachStdout: true,
+		AttachStderr: true,
+		Cmd:          cmd,
+	}
+
+	response, err := cli.ContainerExecCreate(ctx, ContainerName, optionsCreate)
+	if err != nil {
+		panic(err)
+	}
+
+	optionsAttach := types.ExecStartCheck{
+		Detach: false,
+		Tty:    false,
+	}
+	connection, err := cli.ContainerExecAttach(ctx, response.ID, optionsAttach)
+	if err != nil {
+		panic(err)
+	}
+
+	defer connection.Close()
+	output, err := ioutil.ReadAll(connection.Reader)
+	if err != nil {
+		panic(err)
+	}
+	return output
 }

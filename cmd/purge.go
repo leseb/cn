@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
@@ -27,6 +28,7 @@ func removeContainer() {
 
 // purgeNano purges Ceph Nano.
 func purgeNano(c *cli.Context) {
+	fmt.Println("Purging ceph-nano... ")
 	removeContainer()
 	removeCephNanoVolumes()
 }

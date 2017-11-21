@@ -111,7 +111,7 @@ func cephNanoS3Health() {
 		poll++
 	}
 	fmt.Println("S3 gateway is not responding. Showing S3 logs:")
-	// SHOW LOGS
+	showS3Logs()
 	fmt.Println("Please open an issue at: https://github.com/ceph/ceph-nano.")
 	os.Exit(1)
 }

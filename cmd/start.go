@@ -27,12 +27,36 @@ func runContainer() {
 		panic(err)
 	}
 
-	resp, err := cli.ContainerCreate(ctx, &container.Config{
+	//CephDockerVols := []string{"varlibceph", "etcceph"}
+
+	//TODO: change 0.0.0.0?
+	exposedPorts, portBindings, _ := nat.ParsePortSpecs([]string{":8000:8000"})
+	envs := []string{
+		"DEBUG=verbose",
+		"CEPH_DEMO_UID=" + CephNanoUID,
+		"NETWORK_AUTO_DETECT=4",
+		"MON_IP=127.0.0.1",
+		"RGW_CIVETWEB_PORT=" + RgwPort,
+		"CEPH_DAEMON=demo"}
+
+	varlibceph := make(map[string]struct{})
+	varlibceph["/var/lib/ceph"] = struct{}{}
+	etcceph := make(map[string]struct{})
+	etcceph["/etc/ceph"] = struct{}{}
+
+	config := &container.Config{
 		Image:        imageName,
-		ExposedPorts: nat.PortSet{"8000": struct{}{}},
-	}, &container.HostConfig{
-		PortBindings: map[nat.Port][]nat.PortBinding{nat.Port("8000"): {{HostIP: "127.0.0.1", HostPort: "8000"}}},
-	}, nil, "")
+		Hostname:     ContainerName + "-faa32aebf00b",
+		ExposedPorts: exposedPorts,
+		Env:          envs,
+		//Volumes: {"/var/lib/ceph": {varlibceph}},
+	}
+	hostConfig := &container.HostConfig{
+		PortBindings: portBindings,
+		AutoRemove:   true,
+	}
+
+	resp, err := cli.ContainerCreate(ctx, config, hostConfig, nil, ContainerName)
 	if err != nil {
 		panic(err)
 	}
@@ -40,12 +64,10 @@ func runContainer() {
 	if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
 		panic(err)
 	}
-
-	fmt.Println(resp.ID)
-
 }
 
 // startContainer starts a container that is stopped
+/*
 func startContainer() {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
@@ -57,6 +79,7 @@ func startContainer() {
 		panic(err)
 	}
 }
+*/
 
 // startNano starts Ceph Nano
 func startNano(c *cli.Context) {
@@ -65,12 +88,13 @@ func startNano(c *cli.Context) {
 	}
 	createCephNanoVolumes()
 
-	fmt.Println("Starting ceph-nano...")
-	startContainer()
 	if status := containerStatus(); status {
-		startContainer()
+		fmt.Println("ceph-nano is already running!")
+		echoInfo()
 	} else {
+		fmt.Println("Running ceph-nano...")
 		runContainer()
+		echoInfo()
 	}
 	// wait for the container to be ready
 	//WaitForContainer()
