@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 
@@ -37,7 +36,7 @@ func selinux() {
 	if _, err := os.Stat("/sbin/getenforce"); !os.IsNotExist(err) {
 		out, err := exec.Command("getenforce").Output()
 		if err != nil {
-			log.Fatal(err)
+			panic(err)
 		}
 		if string(out) == "Enforcing" {
 			exec.Command("chcon -Rt svirt_sandbox_file_t %s", WorkingDirectory)

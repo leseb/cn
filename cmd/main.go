@@ -18,5 +18,6 @@ var ContainerName = "ceph-nano"
 // Main is the main function calling the whole program
 func Main() {
 	dockerExist()
+	selinux()
 	nanoCli()
 }
