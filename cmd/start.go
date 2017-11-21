@@ -51,8 +51,7 @@ func runContainer() {
 	}
 	hostConfig := &container.HostConfig{
 		PortBindings: portBindings,
-		//AutoRemove:   true,
-		Binds: []string{WorkingDirectory + ":/tmp"},
+		Binds:        []string{WorkingDirectory + ":/tmp"},
 	}
 
 	resp, err := cli.ContainerCreate(ctx, config, hostConfig, nil, ContainerName)
