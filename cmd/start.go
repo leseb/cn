@@ -82,7 +82,6 @@ func startNano(c *cli.Context) {
 	if _, err := os.Stat(WorkingDirectory); os.IsNotExist(err) {
 		os.Mkdir(WorkingDirectory, 0755)
 	}
-	createCephNanoVolumes()
 
 	// test for leftover container
 	if status := containerStatus(true, "created"); status {

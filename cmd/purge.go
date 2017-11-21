@@ -30,5 +30,4 @@ func removeContainer(name string) {
 func purgeNano(c *cli.Context) {
 	fmt.Println("Purging ceph-nano... ")
 	removeContainer(ContainerName)
-	removeCephNanoVolumes()
 }
