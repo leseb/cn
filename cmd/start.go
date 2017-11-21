@@ -51,8 +51,8 @@ func runContainer() {
 	}
 	hostConfig := &container.HostConfig{
 		PortBindings: portBindings,
-		AutoRemove:   true,
-		Binds:        []string{WorkingDirectory + ":/tmp"},
+		//AutoRemove:   true,
+		Binds: []string{WorkingDirectory + ":/tmp"},
 	}
 
 	resp, err := cli.ContainerCreate(ctx, config, hostConfig, nil, ContainerName)
@@ -66,7 +66,6 @@ func runContainer() {
 }
 
 // startContainer starts a container that is stopped
-/*
 func startContainer() {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
@@ -78,7 +77,6 @@ func startContainer() {
 		panic(err)
 	}
 }
-*/
 
 // startNano starts Ceph Nano
 func startNano(c *cli.Context) {
@@ -88,17 +86,22 @@ func startNano(c *cli.Context) {
 	createCephNanoVolumes()
 
 	// test for leftover container
-	if status := containerStatus(true); status {
+	if status := containerStatus(true, "created"); status {
 		removeContainer(ContainerName)
 	}
 
-	if status := containerStatus(false); status {
+	if status := containerStatus(false, "running"); status {
 		fmt.Println("ceph-nano is already running!")
-		//echoInfo()
+		echoInfo()
+	} else if status := containerStatus(true, "exited"); status {
+		fmt.Println("Starting ceph-nano...")
+		startContainer()
+		// wait for the container to be ready
+		echoInfo()
 	} else {
 		fmt.Println("Running ceph-nano...")
 		runContainer()
 		// wait for the container to be ready
-		//echoInfo()
+		echoInfo()
 	}
 }

@@ -19,7 +19,7 @@ func stopNano(c *cli.Context) {
 	}
 
 	timeout := 5 * time.Second
-	if status := containerStatus(false); !status {
+	if status := containerStatus(true, "exited"); status {
 		fmt.Println("ceph-nano is already stopped!")
 		os.Exit(1)
 	} else {

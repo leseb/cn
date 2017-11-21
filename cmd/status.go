@@ -11,7 +11,8 @@ import (
 )
 
 // containerStatus checks container status
-func containerStatus(allList bool) bool {
+// the parameter corresponds to the type listOptions and its entry all
+func containerStatus(allList bool, containerState string) bool {
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		panic(err)
@@ -26,9 +27,10 @@ func containerStatus(allList bool) bool {
 		panic(err)
 	}
 
+	// run the loop on both indexes, it's fine they have the same length
 	for _, container := range containers {
-		for _, name := range container.Names {
-			if name == "/ceph-nano" {
+		for i := range container.Names {
+			if container.Names[i] == "/ceph-nano" && container.State == containerState {
 				return true
 			}
 		}
@@ -38,7 +40,7 @@ func containerStatus(allList bool) bool {
 
 // statusNano show Ceph Nano status
 func statusNano(c *cli.Context) {
-	if status := containerStatus(false); !status {
+	if status := containerStatus(true, "exited"); status {
 		fmt.Println("ceph-nano is stopped!")
 		os.Exit(1)
 	}
