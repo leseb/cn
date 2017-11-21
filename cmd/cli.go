@@ -13,7 +13,7 @@ func nanoCli() {
 	app.Name = "ceph-nano"
 	app.Author = "ceph.com"
 	app.Usage = "One step S3 in container with Ceph!"
-	//	app.CustomAppHelpTemplate = nanoHelpTemplate
+	app.Version = Version
 
 	app.Flags = []cli.Flag{
 		cli.StringFlag{

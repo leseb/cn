@@ -64,9 +64,6 @@ func execContainer(ContainerName string, cmd []string) []byte {
 		panic(err)
 	}
 
-	//cmd := []string{"/bin/cat", "/nano_user_details"}
-	//cmd := []string{"cat", "/var/log/ceph/client.rgw.ceph-nano-faa32aebf00b.log"}
-
 	optionsCreate := types.ExecConfig{
 		AttachStdout: true,
 		AttachStderr: true,
@@ -92,5 +89,7 @@ func execContainer(ContainerName string, cmd []string) []byte {
 	if err != nil {
 		panic(err)
 	}
-	return output
+
+	// remove for 8 characters to get a readable content
+	return output[8:]
 }

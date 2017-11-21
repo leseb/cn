@@ -94,8 +94,7 @@ func startNano(c *cli.Context) {
 	} else {
 		fmt.Println("Running ceph-nano...")
 		runContainer()
+		// wait for the container to be ready
 		echoInfo()
 	}
-	// wait for the container to be ready
-	//WaitForContainer()
 }
