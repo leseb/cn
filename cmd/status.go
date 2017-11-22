@@ -23,7 +23,7 @@ func CliStatusNano() *cobra.Command {
 
 // statusNano shows Ceph Nano status
 func statusNano(cmd *cobra.Command, args []string) {
-	if status := containerStatus(true, "exited"); status {
+	if status := containerStatus(false, "running"); !status {
 		fmt.Println("ceph-nano is not running!")
 		os.Exit(1)
 	}

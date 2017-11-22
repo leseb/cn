@@ -38,7 +38,11 @@ var (
 // Main is the main function calling the whole program
 func Main() {
 	dockerExist()
-	selinux()
+	seLinux()
+
+	//	rootCmd.SetUsageFunc(usageFunc)
+	//rootCmd.SetHelpTemplate(`{{.UsageString}}`)
+
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -72,5 +76,5 @@ func init() {
 }
 
 func init() {
-	cobra.EnablePrefixMatching = true
+	cobra.EnableCommandSorting = false
 }

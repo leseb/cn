@@ -30,16 +30,19 @@ func dockerExist() {
 	}
 }
 
-// Selinux checks if Selinux is installed and set to Enforcing,
+// seLinux checks if Selinux is installed and set to Enforcing,
 // we relabel our WorkingDirectory to allow the container to access files in this directory
-func selinux() {
+func seLinux() {
 	if _, err := os.Stat("/sbin/getenforce"); !os.IsNotExist(err) {
 		out, err := exec.Command("getenforce").Output()
 		if err != nil {
 			panic(err)
 		}
 		if string(out) == "Enforcing" {
-			exec.Command("chcon -Rt svirt_sandbox_file_t %s", WorkingDirectory)
+			if _, err := os.Stat(WorkingDirectory); os.IsNotExist(err) {
+				os.Mkdir(WorkingDirectory, 0755)
+			}
+			exec.Command("sudo chcon -Rt svirt_sandbox_file_t %s", WorkingDirectory)
 		}
 	}
 }

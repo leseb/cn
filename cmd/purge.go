@@ -3,6 +3,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
@@ -22,6 +23,10 @@ func CliPurgeNano() *cobra.Command {
 
 // purgeNano purges Ceph Nano.
 func purgeNano(cmd *cobra.Command, args []string) {
+	if status := containerStatus(false, "running"); !status {
+		fmt.Println("ceph-nano does not exist yet!")
+		os.Exit(1)
+	}
 	fmt.Println("Purging ceph-nano... ")
 	removeContainer(ContainerName)
 }

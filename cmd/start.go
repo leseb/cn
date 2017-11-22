@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -28,31 +27,26 @@ func CliStartNano() *cobra.Command {
 
 // startNano starts Ceph Nano
 func startNano(cmd *cobra.Command, args []string) {
-	if _, err := os.Stat(WorkingDirectory); os.IsNotExist(err) {
-		os.Mkdir(WorkingDirectory, 0755)
-	}
-
-	// test for a leftover container
-	// usually happens when someone fails to run the container on an exposed Directory
-	// typical error on Docker For Mac
+	// Test for a leftover container
+	// Usually happens when someone fails to run the container on an exposed directory
+	// Typical error on Docker For Mac you will see:
+	// panic: Error response from daemon: Mounts denied:
+	// The path /usr/share/ceph-nano is not shared from OS X and is not known to Docker.
+	// You can configure shared paths from Docker -> Preferences... -> File Sharing.
 	if status := containerStatus(true, "created"); status {
 		removeContainer(ContainerName)
 	}
 
 	if status := containerStatus(false, "running"); status {
 		fmt.Println("ceph-nano is already running!")
-		echoInfo()
 	} else if status := containerStatus(true, "exited"); status {
 		fmt.Println("Starting ceph-nano...")
 		startContainer()
-		// wait for the container to be ready
-		echoInfo()
 	} else {
 		fmt.Println("Running ceph-nano...")
 		runContainer()
-		// wait for the container to be ready
-		echoInfo()
 	}
+	echoInfo()
 }
 
 // runContainer creates a new container when nothing exists
@@ -64,13 +58,11 @@ func runContainer() {
 	}
 
 	imageName := "ceph/daemon"
-
 	_, err = cli.ImagePull(ctx, imageName, types.ImagePullOptions{})
 	if err != nil {
 		panic(err)
 	}
 
-	//TODO: change 0.0.0.0?
 	exposedPorts, portBindings, _ := nat.ParsePortSpecs([]string{":8000:8000"})
 	envs := []string{
 		"DEBUG=verbose",
@@ -90,6 +82,7 @@ func runContainer() {
 			"/var/lib/ceph": struct{}{},
 		},
 	}
+
 	hostConfig := &container.HostConfig{
 		PortBindings: portBindings,
 		Binds:        []string{WorkingDirectory + ":/tmp"},
@@ -101,7 +94,6 @@ func runContainer() {
 	if err != nil {
 		panic(err)
 	}
-
 	if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
 		panic(err)
 	}

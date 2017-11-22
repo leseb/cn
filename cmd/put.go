@@ -7,18 +7,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-/*
-   elif [[ "${array[0]}" =~ put|sync ]]; then
-     local input_file="${array[1]}"
-     if [ ! -e "$input_file" ]; then
-         echo "$input_file doesn't exist !"
-         return
-     fi
-     if [ "$(dirname $input_file)" != "$WORKING_DIR" ]; then
-         echo "$input_file should be in $WORKING_DIR directory !"
-         return
-     fi
-*/
 // CliS3CmdPut is the Cobra CLI call
 func CliS3CmdPut() *cobra.Command {
 	cmd := &cobra.Command{
