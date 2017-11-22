@@ -6,9 +6,32 @@ import (
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
-	"github.com/urfave/cli"
+	"github.com/spf13/cobra"
 	"golang.org/x/net/context"
 )
+
+// CliStatusNano is the Cobra CLI call
+func CliStatusNano() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "status",
+		Short: "Stats object storage server",
+		Args:  cobra.NoArgs,
+		Run:   statusNano,
+	}
+	return cmd
+}
+
+// statusNano shows Ceph Nano status
+func statusNano(cmd *cobra.Command, args []string) {
+	if status := containerStatus(true, "exited"); status {
+		fmt.Println("ceph-nano is not running!")
+		os.Exit(1)
+	} else {
+		fmt.Println("ceph-nano does not exist yet!")
+		os.Exit(1)
+	}
+	echoInfo()
+}
 
 // containerStatus checks container status
 // the parameter corresponds to the type listOptions and its entry all
@@ -36,13 +59,4 @@ func containerStatus(allList bool, containerState string) bool {
 		}
 	}
 	return false
-}
-
-// statusNano show Ceph Nano status
-func statusNano(c *cli.Context) {
-	if status := containerStatus(true, "exited"); status {
-		fmt.Println("ceph-nano is stopped!")
-		os.Exit(1)
-	}
-	echoInfo()
 }

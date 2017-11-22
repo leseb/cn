@@ -4,12 +4,23 @@ import (
 	"fmt"
 
 	"github.com/docker/docker/client"
-	"github.com/urfave/cli"
+	"github.com/spf13/cobra"
 	"golang.org/x/net/context"
 )
 
-// restartNano restarts the container
-func restartNano(c *cli.Context) {
+// CliRestartNano is the Cobra CLI call
+func CliRestartNano() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "restart",
+		Short: "Restarts object storage server",
+		Args:  cobra.NoArgs,
+		Run:   restartNano,
+	}
+	return cmd
+}
+
+// restartNano restarts Ceph Nano
+func restartNano(cmd *cobra.Command, args []string) {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {

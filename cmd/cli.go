@@ -1,6 +1,8 @@
+/*
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/urfave/cli"
@@ -15,20 +17,19 @@ func nanoCli() {
 	app.Usage = "One step S3 in container with Ceph!"
 	app.Version = Version
 
-	app.Flags = []cli.Flag{
-		cli.StringFlag{
-			Name:        "work-dir, d",
-			Value:       "" + WorkingDirectory,
-			Usage:       "Only files within this `DIRECTORY` can be uploaded in Ceph Nano.",
-			Destination: &WorkingDirectory,
-		},
-	}
-
 	app.Commands = []cli.Command{
 		{
 			Name:   "start",
 			Usage:  "Starts object storage server. Default working directory is " + WorkingDirectory,
 			Action: startNano,
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:        "work-dir, d",
+					Value:       "" + WorkingDirectory,
+					Usage:       "Only files within this `DIRECTORY` can be uploaded in Ceph Nano.",
+					Destination: &WorkingDirectory,
+				},
+			},
 		},
 		{
 			Name:   "stop",
@@ -139,5 +140,44 @@ func nanoCli() {
 			Action:    s3cmdWrapper,
 		},
 	}
+	app.Action = func(c *cli.Context) error {
+		fmt.Printf("%#v\n", c.Args().Tail())
+
+		return nil
+	}
 	app.Run(os.Args)
 }
+*/
+
+package cmd
+
+/*
+import (
+	"github.com/spf13/cobra"
+)
+
+const (
+	cliName        = "cn"
+	cliDescription = "One step S3 in container with Ceph."
+)
+
+var (
+	rootCmd = &cobra.Command{
+		Use:        cliName,
+		Short:      cliDescription,
+		SuggestFor: []string{"cn"},
+	}
+)
+
+func init() {
+	//rootCmd.PersistentFlags().StringSliceVar(&globalFlags.Endpoints, "endpoints", []string{"127.0.0.1:2379"}, "gRPC endpoints")
+
+	rootCmd.AddCommand(
+		startNano(),
+	)
+}
+
+func init() {
+	cobra.EnablePrefixMatching = true
+}
+*/

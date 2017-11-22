@@ -6,12 +6,23 @@ import (
 	"time"
 
 	"github.com/docker/docker/client"
-	"github.com/urfave/cli"
+	"github.com/spf13/cobra"
 	"golang.org/x/net/context"
 )
 
-// stopNano stops the container
-func stopNano(c *cli.Context) {
+// CliStopNano is the Cobra CLI call
+func CliStopNano() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "stop",
+		Short: "Stops object storage server",
+		Args:  cobra.NoArgs,
+		Run:   stopNano,
+	}
+	return cmd
+}
+
+// stopNano stops Ceph Nano
+func stopNano(cmd *cobra.Command, args []string) {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
@@ -22,6 +33,10 @@ func stopNano(c *cli.Context) {
 	if status := containerStatus(true, "exited"); status {
 		fmt.Println("ceph-nano is already stopped!")
 		os.Exit(1)
+	} else if status := containerStatus(true, "nil"); !status {
+		fmt.Println("ceph-nano does not exist yet!")
+		os.Exit(1)
+		// vais-je rentrer dans le else un jour?...
 	} else {
 		fmt.Println("Stopping ceph-nano... ")
 		if err := cli.ContainerStop(ctx, ContainerName, &timeout); err != nil {

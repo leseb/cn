@@ -3,11 +3,22 @@ package cmd
 import (
 	"fmt"
 
-	"github.com/urfave/cli"
+	"github.com/spf13/cobra"
 )
 
+// CliLogsNano is the Cobra CLI call
+func CliLogsNano() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "logs",
+		Short: "Prints object storage server logs",
+		Args:  cobra.NoArgs,
+		Run:   logsNano,
+	}
+	return cmd
+}
+
 // logsNano prints rgw logs
-func logsNano(c *cli.Context) {
+func logsNano(cmd *cobra.Command, args []string) {
 	showS3Logs()
 }
 
