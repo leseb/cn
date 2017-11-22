@@ -2,40 +2,29 @@ package cmd
 
 import (
 	"fmt"
-	"strings"
+	"os"
+
+	"github.com/spf13/cobra"
 )
 
-// echoInfo prints useful information about Ceph Nano
-func echoInfo() {
-	// Always wait the container to be ready
-	cephNanoHealth()
-	cephNanoS3Health()
+// CliS3CmdInfo is the Cobra CLI call
+func CliS3CmdInfo() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "info BUCKET[/OBJECT]",
+		Short: "Get various information about Buckets or Files",
+		Args:  cobra.ExactArgs(1),
+		Run:   S3CmdInfo,
+	}
+	return cmd
+}
 
-	// Fetch Amazon Keys
-	CephNanoAccessKey, CephNanoSecretKey := getAwsKey()
-
-	// Get Ceph health
-	cmd := []string{"ceph", "health"}
-	c := execContainer(ContainerName, cmd)
-
-	// Get IPs, later using the first IP of the list is not ideal
-	// However, Docker binds RGW port on 0.0.0.0 so any address will work
-	ips, _ := getInterfaceIPv4s()
-
-	InfoLine := "\n" +
-		strings.TrimSpace(string(c)) +
-		" is the Ceph status. \n" +
-		"Ceph Rados Gateway address is: http://" + ips[0].String() + ":8000 \n" +
-		"Your working directory is: " +
-		WorkingDirectory +
-		"\n" +
-		"S3 user is: nano \n" +
-		"S3 access key is: " +
-		CephNanoAccessKey +
-		"\n" +
-		"S3 secret key is: " +
-		CephNanoSecretKey +
-		"\n" +
-		""
-	fmt.Println(InfoLine)
+// S3CmdInfo wraps s3cmd command in the container
+func S3CmdInfo(cmd *cobra.Command, args []string) {
+	if status := containerStatus(true, "exited"); status {
+		fmt.Println("ceph-nano is not running!")
+		os.Exit(1)
+	}
+	command := []string{"s3cmd", "info", "s3://" + args[0]}
+	output := execContainer(ContainerName, command)
+	fmt.Printf("%s", output)
 }

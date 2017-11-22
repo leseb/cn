@@ -26,9 +26,6 @@ func statusNano(cmd *cobra.Command, args []string) {
 	if status := containerStatus(true, "exited"); status {
 		fmt.Println("ceph-nano is not running!")
 		os.Exit(1)
-	} else {
-		fmt.Println("ceph-nano does not exist yet!")
-		os.Exit(1)
 	}
 	echoInfo()
 }

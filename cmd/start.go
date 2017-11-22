@@ -16,11 +16,13 @@ import (
 func CliStartNano() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "start",
-		Short: "Starts object storage server. Default working directory is " + WorkingDirectory,
+		Short: "Starts object storage server",
 		Args:  cobra.NoArgs,
 		Run:   startNano,
+		Example: "cn start --work-dir /tmp \n" +
+			"cn start",
 	}
-	cmd.Flags().StringVarP(&WorkingDirectory, "work-dir", "d", "", "Directory to work from")
+	cmd.Flags().StringVarP(&WorkingDirectory, "work-dir", "d", "/usr/share/ceph-nano", "Directory to work from")
 	return cmd
 }
 
@@ -30,7 +32,9 @@ func startNano(cmd *cobra.Command, args []string) {
 		os.Mkdir(WorkingDirectory, 0755)
 	}
 
-	// test for leftover container
+	// test for a leftover container
+	// usually happens when someone fails to run the container on an exposed Directory
+	// typical error on Docker For Mac
 	if status := containerStatus(true, "created"); status {
 		removeContainer(ContainerName)
 	}

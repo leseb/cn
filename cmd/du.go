@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/urfave/cli"
+	"github.com/spf13/cobra"
 )
 
 /*
@@ -39,25 +39,26 @@ function s3cmd_wrap {
   fi
 }
 */
-// s3cmdWrapper wraps s3cmd commands to cn
-func s3cmdWrapperMb(c *cli.Context) {
+
+// CliS3CmdDu is the Cobra CLI call
+func CliS3CmdDu() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "du [BUCKET[/PREFIX]]",
+		Short: "Disk usage by buckets",
+		Args:  cobra.ExactArgs(1),
+		Run:   S3CmdDu,
+		DisableFlagsInUseLine: true,
+	}
+	return cmd
+}
+
+// S3CmdDu wraps s3cmd command in the container
+func S3CmdDu(cmd *cobra.Command, args []string) {
 	if status := containerStatus(true, "exited"); status {
 		fmt.Println("ceph-nano is not running!")
 		os.Exit(1)
 	}
-
-	if len(c.Args()) > 1 {
-		fmt.Printf("Too many arguments!")
-		os.Exit(1)
-	}
-	var argFirst string
-	argFirst = c.Args().First()
-
-	cmd := []string{"s3cmd", "mb", "s3://" + argFirst}
-	output := execContainer(ContainerName, cmd)
+	command := []string{"s3cmd", "du", "s3://" + args[0]}
+	output := execContainer(ContainerName, command)
 	fmt.Printf("%s", output)
-}
-
-func s3cmdWrapper(c *cli.Context) {
-	fmt.Printf("%#v\n", c.Args().Tail())
 }
