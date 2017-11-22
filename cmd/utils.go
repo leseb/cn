@@ -90,6 +90,6 @@ func execContainer(ContainerName string, cmd []string) []byte {
 		panic(err)
 	}
 
-	// remove for 8 characters to get a readable content
+	// Remove 8 first characters to get a readable content
 	return output[8:]
 }

@@ -32,6 +32,7 @@ var (
 		Use:        cliName,
 		Short:      cliDescription,
 		SuggestFor: []string{"cn"},
+		//Long:
 	}
 )
 

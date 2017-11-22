@@ -2,6 +2,8 @@ package cmd
 
 import (
 	"fmt"
+	"os"
+	"strings"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -44,13 +46,13 @@ func startNano(cmd *cobra.Command, args []string) {
 		startContainer()
 	} else {
 		fmt.Println("Running ceph-nano...")
-		runContainer()
+		runContainer(cmd, args)
 	}
 	echoInfo()
 }
 
 // runContainer creates a new container when nothing exists
-func runContainer() {
+func runContainer(cmd *cobra.Command, args []string) {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
 	if err != nil {
@@ -58,10 +60,11 @@ func runContainer() {
 	}
 
 	imageName := "ceph/daemon"
-	_, err = cli.ImagePull(ctx, imageName, types.ImagePullOptions{})
+	out, err := cli.ImagePull(ctx, imageName, types.ImagePullOptions{})
 	if err != nil {
 		panic(err)
 	}
+	defer out.Close()
 
 	exposedPorts, portBindings, _ := nat.ParsePortSpecs([]string{":8000:8000"})
 	envs := []string{
@@ -94,7 +97,13 @@ func runContainer() {
 	if err != nil {
 		panic(err)
 	}
-	if err := cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
+
+	err = cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{})
+	if strings.Contains(err.Error(), "Mounts denied") {
+		fmt.Println("ERROR: It looks like you need to use the --work-dir option.")
+		cmd.Help()
+		os.Exit(1)
+	} else {
 		panic(err)
 	}
 }

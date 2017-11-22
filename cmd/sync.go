@@ -25,6 +25,10 @@ func S3CmdSync(cmd *cobra.Command, args []string) {
 		fmt.Println("ceph-nano is not running!")
 		os.Exit(1)
 	}
+	fmt.Printf("Syncing directory '%s' in the '%s' bucket. \n"+
+		"It might take some time depending on the amount of data. \n"+
+		"Do not expect any output until the upload is finished. \n \n", args[0], args[1])
+
 	command := []string{"s3cmd", "sync", args[0], "s3://" + args[1]}
 	output := execContainer(ContainerName, command)
 	fmt.Printf("%s", output)
