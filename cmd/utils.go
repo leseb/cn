@@ -98,7 +98,12 @@ func execContainer(ContainerName string, cmd []string) []byte {
 	}
 
 	// Remove 8 first characters to get a readable content
-	return output[8:]
+	// Sometimes the command returns nothing, without the following if the program fails without
+	// runtime error: slice bounds out of range
+	if len(output) > 0 {
+		return output[8:]
+	}
+	return nil
 }
 
 // dockerApiVersion checks docker's API Version
