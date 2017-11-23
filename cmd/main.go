@@ -51,8 +51,6 @@ func Main() {
 }
 
 func init() {
-	//rootCmd.PersistentFlags().StringSliceVar(&globalFlags.Endpoints, "endpoints", []string{"127.0.0.1:2379"}, "gRPC endpoints")
-
 	rootCmd.AddCommand(
 		CliStartNano(),
 		CliStopNano(),
@@ -61,18 +59,7 @@ func init() {
 		CliLogsNano(),
 		CliRestartNano(),
 		CliVersionNano(),
-		CliS3CmdMb(),
-		CliS3CmdRb(),
-		CliS3CmdLs(),
-		CliS3CmdLa(),
-		CliS3CmdPut(),
-		CliS3CmdGet(),
-		CliS3CmdDel(),
-		CliS3CmdDu(),
-		CliS3CmdInfo(),
-		CliS3CmdCp(),
-		CliS3CmdMv(),
-		CliS3CmdSync(),
+		cmdS3,
 	)
 }
 
