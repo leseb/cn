@@ -41,9 +41,6 @@ func Main() {
 	dockerExist()
 	seLinux()
 
-	//	rootCmd.SetUsageFunc(usageFunc)
-	//rootCmd.SetHelpTemplate(`{{.UsageString}}`)
-
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
