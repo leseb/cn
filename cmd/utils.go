@@ -262,6 +262,9 @@ func echoInfo() {
 	// However, Docker binds RGW port on 0.0.0.0 so any address will work
 	ips, _ := getInterfaceIPv4s()
 
+	// Get the working directory
+	dir := dockerInspect()
+
 	InfoLine := "\n" +
 		strings.TrimSpace(string(c)) +
 		" is the Ceph status. \n" +
@@ -274,7 +277,7 @@ func echoInfo() {
 		CephNanoSecretKey +
 		"\n" +
 		"Your working directory is: " +
-		WorkingDirectory +
+		dir +
 		"\n" +
 		""
 	fmt.Println(InfoLine)
@@ -304,4 +307,19 @@ func getAwsKey() (string, string) {
 	var CephNanoSecretKey string
 	CephNanoSecretKey = parsedMap.Keys[0].SecretKey
 	return CephNanoAccessKey, CephNanoSecretKey
+}
+
+// dockerInspect inspect the container Binds
+func dockerInspect() string {
+	ctx := context.Background()
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		panic(err)
+	}
+	inspect, err := cli.ContainerInspect(ctx, ContainerName)
+	if err != nil {
+		panic(err)
+	}
+	parts := strings.Split(inspect.HostConfig.Binds[0], ":")
+	return parts[0]
 }
