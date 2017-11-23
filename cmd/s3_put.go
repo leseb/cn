@@ -25,9 +25,10 @@ func S3CmdPut(cmd *cobra.Command, args []string) {
 		fmt.Println("ceph-nano is not running!")
 		os.Exit(1)
 	}
+	dir := dockerInspect()
 	if _, err := os.Stat(args[0]); os.IsNotExist(err) {
 		fmt.Printf("Input file: '%s' doesn't exit in the current directory. \n"+
-			"Use the full path of the file or change directory to your working directory: %s \n", args[0], WorkingDirectory)
+			"Use the full path of the file or change directory to your working directory: %s \n", args[0], dir)
 		os.Exit(1)
 	}
 	command := []string{"s3cmd", "put", args[0], "s3://" + args[1]}
