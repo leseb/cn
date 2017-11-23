@@ -99,26 +99,9 @@ func runContainer(cmd *cobra.Command, args []string) {
 	}
 
 	err = cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{})
-	/* The if removes the error:
-	 panic: runtime error: invalid memory address or nil pointer dereference
-	[signal SIGSEGV: segmentation violation code=0x1 addr=0x20 pc=0x137a2b4]
-
-	goroutine 1 [running]:
-	github.com/leseb/cn/cmd.runContainer(0xc420089200, 0xc4202d8140, 0x0, 0x2)
-	        /Users/leseb/go/src/github.com/leseb/cn/cmd/start.go:102 +0x734
-	github.com/leseb/cn/cmd.startNano(0xc420089200, 0xc4202d8140, 0x0, 0x2)
-	        /Users/leseb/go/src/github.com/leseb/cn/cmd/start.go:49 +0x1c3
-	github.com/spf13/cobra.(*Command).execute(0xc420089200, 0xc4202d8120, 0x2, 0x2, 0xc420089200, 0xc4202d8120)
-	        /Users/leseb/go/src/github.com/spf13/cobra/command.go:704 +0x2c6
-	github.com/spf13/cobra.(*Command).ExecuteC(0x16a0520, 0xc4202dc0f0, 0xc4202c86c0, 0xc4202c8900)
-	        /Users/leseb/go/src/github.com/spf13/cobra/command.go:785 +0x30e
-	github.com/spf13/cobra.(*Command).Execute(0x16a0520, 0x0, 0xc4202c9440)
-	        /Users/leseb/go/src/github.com/spf13/cobra/command.go:738 +0x2b
-	github.com/leseb/cn/cmd.Main()
-	        /Users/leseb/go/src/github.com/leseb/cn/cmd/main.go:47 +0x3b
-	main.main()
-	        /Users/leseb/go/src/github.com/leseb/cn/main.go:30 +0x20
-	*/
+	// The if removes the error:
+	//panic: runtime error: invalid memory address or nil pointer dereference
+	//[signal SIGSEGV: segmentation violation code=0x1 addr=0x20 pc=0x137a2b4]
 	if err != nil {
 		if strings.Contains(err.Error(), "Mounts denied") {
 			fmt.Println("ERROR: It looks like you need to use the --work-dir option.")

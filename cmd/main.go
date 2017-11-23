@@ -9,7 +9,7 @@ import (
 
 const (
 	cliName        = "cn"
-	cliDescription = "One step S3 in container with Ceph."
+	cliDescription = "Ceph Nano - One step S3 in container with Ceph."
 )
 
 var (

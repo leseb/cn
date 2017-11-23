@@ -10,19 +10,36 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	// IamSure means whenver or not the user wants to purge
+	IamSure bool
+
+	// Help shows a customer help
+	Help bool
+)
+
 // CliPurgeNano is the Cobra CLI call
 func CliPurgeNano() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "purge",
-		Short: "DANGEROUS! Purges object storage server",
+		Short: "Purges object storage server. DANGEROUS!",
 		Args:  cobra.NoArgs,
 		Run:   purgeNano,
+		DisableFlagsInUseLine: false,
 	}
+	cmd.Flags().SortFlags = false
+	cmd.Flags().BoolVar(&IamSure, "yes-i-am-sure", false, "YES I know what I'm doing and I want to purge")
+	cmd.Flags().BoolVar(&Help, "help", false, "help for purge")
 	return cmd
 }
 
 // purgeNano purges Ceph Nano.
 func purgeNano(cmd *cobra.Command, args []string) {
+	if !IamSure {
+		fmt.Printf("Purge option is too dangerous please set the right flag. \n \n")
+		cmd.Help()
+		os.Exit(1)
+	}
 	if status := containerStatus(false, "running"); !status {
 		fmt.Println("ceph-nano does not exist yet!")
 		os.Exit(1)

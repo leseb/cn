@@ -1,11 +1,18 @@
 package cmd
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net"
+	"net/http"
+	"os"
+	"os/exec"
 	"sort"
+	"strings"
+	"time"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
@@ -92,4 +99,204 @@ func execContainer(ContainerName string, cmd []string) []byte {
 
 	// Remove 8 first characters to get a readable content
 	return output[8:]
+}
+
+// dockerApiVersion checks docker's API Version
+func dockerAPIVersion() {
+
+}
+
+// dockerExist makes sure Docker is installed
+func dockerExist() {
+	ctx := context.Background()
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		panic(err)
+	}
+	_, err = cli.Info(ctx)
+	if err != nil {
+		fmt.Println("Docker is not present on your system or not started.\n" +
+			"Make sure it's started or follow installation instructions at https://docs.docker.com/engine/installation/")
+		os.Exit(1)
+	}
+}
+
+// seLinux checks if Selinux is installed and set to Enforcing,
+// we relabel our WorkingDirectory to allow the container to access files in this directory
+func seLinux() {
+	if _, err := os.Stat("/sbin/getenforce"); !os.IsNotExist(err) {
+		out, err := exec.Command("getenforce").Output()
+		if err != nil {
+			panic(err)
+		}
+		if string(out) == "Enforcing" {
+			if _, err := os.Stat(WorkingDirectory); os.IsNotExist(err) {
+				os.Mkdir(WorkingDirectory, 0755)
+			}
+			exec.Command("sudo chcon -Rt svirt_sandbox_file_t %s", WorkingDirectory)
+		}
+	}
+}
+
+// grepForSuccess searchs for the word 'SUCCESS' inside the container logs
+func grepForSuccess() bool {
+	ctx := context.Background()
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		panic(err)
+	}
+	out, err := cli.ContainerLogs(ctx, ContainerName, types.ContainerLogsOptions{ShowStdout: true})
+	if err != nil {
+		panic(err)
+	}
+
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(out)
+	newStr := buf.String()
+
+	if strings.Contains(newStr, "SUCCESS") {
+		return true
+	}
+	return false
+}
+
+// cephNanoHealth loops on grepForSuccess for 30 seconds, fails after.
+func cephNanoHealth() {
+	// setting timeout values
+	var timeout int
+	timeout = 60
+	var poll int
+	poll = 0
+
+	// setting docker connection
+	ctx := context.Background()
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		panic(err)
+	}
+
+	// wait for 60sec to validate that the container started properly
+	for poll < timeout {
+		if health := grepForSuccess(); health {
+			return
+		}
+		time.Sleep(time.Second * 1)
+		poll++
+	}
+
+	// if we reach here, something is broken in the container
+	fmt.Print("The container from Ceph Nano never reached a clean state. Show the container logs:")
+	// ideally we would return the second value of GrepForSuccess when it's false
+	// this would mean having 2 return values for GrepForSuccess
+	out, err := cli.ContainerLogs(ctx, ContainerName, types.ContainerLogsOptions{ShowStdout: true})
+	if err != nil {
+		panic(err)
+	}
+	buf := new(bytes.Buffer)
+	buf.ReadFrom(out)
+	newStr := buf.String()
+	fmt.Println(newStr)
+	fmt.Println("Please open an issue at: https://github.com/ceph/ceph-container.")
+	os.Exit(1)
+}
+
+// curlS3 queries S3 URL
+func curlS3() bool {
+	ips, _ := getInterfaceIPv4s()
+	// Taking the first IP is probably not ideal
+	// IMHO, using the interface with most of the traffic is better
+	var url string
+	url = "http://" + ips[0].String() + ":8000"
+
+	response, err := http.Get(url)
+	if err != nil {
+		return false
+	}
+	defer response.Body.Close()
+	if _, err := ioutil.ReadAll(response.Body); err != nil {
+		return false
+	}
+	return true
+}
+
+// CephNanoS3Health loops for 30 seconds while testing Ceph RGW heatlh
+func cephNanoS3Health() {
+	// setting timeout
+	var timeout int
+	timeout = 30
+	var poll int
+	poll = 0
+
+	for poll < timeout {
+		if s3Health := curlS3(); s3Health {
+			return
+		}
+		time.Sleep(time.Second * 1)
+		poll++
+	}
+	fmt.Println("S3 gateway is not responding. Showing S3 logs:")
+	showS3Logs()
+	fmt.Println("Please open an issue at: https://github.com/ceph/ceph-nano.")
+	os.Exit(1)
+}
+
+// echoInfo prints useful information about Ceph Nano
+func echoInfo() {
+	// Always wait the container to be ready
+	cephNanoHealth()
+	cephNanoS3Health()
+
+	// Fetch Amazon Keys
+	CephNanoAccessKey, CephNanoSecretKey := getAwsKey()
+
+	// Get Ceph health
+	cmd := []string{"ceph", "health"}
+	c := execContainer(ContainerName, cmd)
+
+	// Get IPs, later using the first IP of the list is not ideal
+	// However, Docker binds RGW port on 0.0.0.0 so any address will work
+	ips, _ := getInterfaceIPv4s()
+
+	InfoLine := "\n" +
+		strings.TrimSpace(string(c)) +
+		" is the Ceph status. \n" +
+		"S3 object server address is: http://" + ips[0].String() + ":8000 \n" +
+		"S3 user is: nano \n" +
+		"S3 access key is: " +
+		CephNanoAccessKey +
+		"\n" +
+		"S3 secret key is: " +
+		CephNanoSecretKey +
+		"\n" +
+		"Your working directory is: " +
+		WorkingDirectory +
+		"\n" +
+		""
+	fmt.Println(InfoLine)
+}
+
+// getAwsKey gets AWS keys from inside the container
+func getAwsKey() (string, string) {
+	cmd := []string{"/bin/cat", "/nano_user_details"}
+
+	output := execContainer(ContainerName, cmd)
+
+	// declare structures for json
+	type s3Details []struct {
+		AccessKey string `json:"Access_key"`
+		SecretKey string `json:"Secret_key"`
+	}
+	type jason struct {
+		Keys s3Details
+	}
+	// assign variable to our json struct
+	var parsedMap jason
+
+	json.Unmarshal(output, &parsedMap)
+
+	var CephNanoAccessKey string
+	CephNanoAccessKey = parsedMap.Keys[0].AccessKey
+	var CephNanoSecretKey string
+	CephNanoSecretKey = parsedMap.Keys[0].SecretKey
+	return CephNanoAccessKey, CephNanoSecretKey
 }

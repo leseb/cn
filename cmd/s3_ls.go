@@ -10,11 +10,10 @@ import (
 // CliS3CmdLs is the Cobra CLI call
 func CliS3CmdLs() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "ls [BUCKET]",
-		Short:   "List objects or buckets",
-		Args:    cobra.ExactArgs(1),
-		Run:     S3CmdLs,
-		Example: "cn ls my-bucket",
+		Use:   "ls [BUCKET]",
+		Short: "List objects or buckets",
+		Args:  cobra.ExactArgs(1),
+		Run:   S3CmdLs,
 	}
 	return cmd
 }

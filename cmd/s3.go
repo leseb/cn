@@ -8,7 +8,7 @@ var (
 	cmdS3 = &cobra.Command{
 		Use:   "s3 [command] [arg]",
 		Short: "Interact with S3 object server",
-		Args:  cobra.ExactArgs(1),
+		Args:  cobra.NoArgs,
 	}
 )
 
