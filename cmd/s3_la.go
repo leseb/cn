@@ -29,8 +29,8 @@ func S3CmdLa(cmd *cobra.Command, args []string) {
 	output := execContainer(ContainerName, command)
 	if len(output) == 1 {
 		command := []string{"s3cmd", "ls"}
-		output := execContainer(ContainerName, command)
-		fmt.Printf("%s", output)
+		o := execContainer(ContainerName, command)
+		fmt.Printf("%s", o)
 	} else {
 		fmt.Printf("%s", output)
 	}
