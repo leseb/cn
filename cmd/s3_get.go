@@ -8,9 +8,6 @@ import (
 )
 
 var (
-	// S3CmdForce means overwrite existing object
-	S3CmdForce bool
-
 	// S3CmdSkip means do not do anything when object exists
 	S3CmdSkip bool
 

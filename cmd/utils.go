@@ -18,6 +18,69 @@ import (
 	"github.com/docker/docker/client"
 )
 
+// validateEnv verifies the ability to run the program
+func validateEnv() {
+	dockerAPIVersion()
+	dockerExist()
+	seLinux()
+}
+
+// dockerApiVersion checks docker's API Version
+func dockerAPIVersion() {
+	ctx := context.Background()
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		panic(err)
+	}
+
+	sv := fmt.Sprint(cli.ServerVersion(ctx))
+	if err != nil {
+		panic(err)
+	}
+
+	if strings.Contains(sv, "is too new") {
+		ss := strings.SplitAfter(sv, "Maximum supported API version is ")
+		os.Setenv("DOCKER_API_VERSION", ss[1])
+	} else if strings.Contains(sv, "client is newer than server") {
+		ss := strings.SplitAfter(sv, "server API version: ")
+		// trim last character since this 'ss[1]' is '1.24.'
+		os.Setenv("DOCKER_API_VERSION", ss[1][:len(ss[1])-1])
+	}
+}
+
+// dockerExist makes sure Docker is installed
+func dockerExist() {
+	ctx := context.Background()
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = cli.Info(ctx)
+	if err != nil {
+		fmt.Println("Docker is not present on your system or not started.\n" +
+			"Make sure it's started or follow installation instructions at https://docs.docker.com/engine/installation/")
+		os.Exit(1)
+	}
+}
+
+// seLinux checks if Selinux is installed and set to Enforcing,
+// we relabel our WorkingDirectory to allow the container to access files in this directory
+func seLinux() {
+	if _, err := os.Stat("/sbin/getenforce"); !os.IsNotExist(err) {
+		out, err := exec.Command("getenforce").Output()
+		if err != nil {
+			panic(err)
+		}
+		if string(out) == "Enforcing" {
+			if _, err := os.Stat(WorkingDirectory); os.IsNotExist(err) {
+				os.Mkdir(WorkingDirectory, 0755)
+			}
+			exec.Command("sudo chcon -Rt svirt_sandbox_file_t %s", WorkingDirectory)
+		}
+	}
+}
+
 // byLastOctetValue implements sort.Interface used in sorting a list
 // of ip address by their last octet value.
 type byLastOctetValue []net.IP
@@ -64,6 +127,7 @@ func getInterfaceIPv4s() ([]net.IP, error) {
 	return nips, nil
 }
 
+// execContainer execs a given command inside the container
 func execContainer(ContainerName string, cmd []string) []byte {
 	ctx := context.Background()
 	cli, err := client.NewEnvClient()
@@ -104,43 +168,6 @@ func execContainer(ContainerName string, cmd []string) []byte {
 		return output[8:]
 	}
 	return nil
-}
-
-// dockerApiVersion checks docker's API Version
-func dockerAPIVersion() {
-
-}
-
-// dockerExist makes sure Docker is installed
-func dockerExist() {
-	ctx := context.Background()
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		panic(err)
-	}
-	_, err = cli.Info(ctx)
-	if err != nil {
-		fmt.Println("Docker is not present on your system or not started.\n" +
-			"Make sure it's started or follow installation instructions at https://docs.docker.com/engine/installation/")
-		os.Exit(1)
-	}
-}
-
-// seLinux checks if Selinux is installed and set to Enforcing,
-// we relabel our WorkingDirectory to allow the container to access files in this directory
-func seLinux() {
-	if _, err := os.Stat("/sbin/getenforce"); !os.IsNotExist(err) {
-		out, err := exec.Command("getenforce").Output()
-		if err != nil {
-			panic(err)
-		}
-		if string(out) == "Enforcing" {
-			if _, err := os.Stat(WorkingDirectory); os.IsNotExist(err) {
-				os.Mkdir(WorkingDirectory, 0755)
-			}
-			exec.Command("sudo chcon -Rt svirt_sandbox_file_t %s", WorkingDirectory)
-		}
-	}
 }
 
 // grepForSuccess searchs for the word 'SUCCESS' inside the container logs

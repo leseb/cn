@@ -10,6 +10,8 @@ var (
 		Short: "Interact with S3 object server",
 		Args:  cobra.NoArgs,
 	}
+	// S3CmdForce means force operation
+	S3CmdForce bool
 )
 
 func init() {

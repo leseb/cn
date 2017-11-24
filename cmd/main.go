@@ -38,8 +38,7 @@ var (
 
 // Main is the main function calling the whole program
 func Main() {
-	dockerExist()
-	seLinux()
+	validateEnv()
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
