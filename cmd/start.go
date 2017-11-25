@@ -17,7 +17,7 @@ import (
 func CliStartNano() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "start",
-		Short: "Starts object storage server",
+		Short: "Start object storage server",
 		Args:  cobra.NoArgs,
 		Run:   startNano,
 		Example: "cn start --work-dir /tmp \n" +

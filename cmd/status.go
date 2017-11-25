@@ -14,7 +14,7 @@ import (
 func CliStatusNano() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "status",
-		Short: "Stats object storage server",
+		Short: "Stat object storage server",
 		Args:  cobra.NoArgs,
 		Run:   statusNano,
 	}

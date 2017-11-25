@@ -14,7 +14,7 @@ import (
 func CliStopNano() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "stop",
-		Short: "Stops object storage server",
+		Short: "Stop object storage server",
 		Args:  cobra.NoArgs,
 		Run:   stopNano,
 	}

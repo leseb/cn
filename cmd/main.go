@@ -54,8 +54,8 @@ func init() {
 		CliPurgeNano(),
 		CliLogsNano(),
 		CliRestartNano(),
-		CliVersionNano(),
 		cmdS3,
+		CliVersionNano(),
 	)
 }
 

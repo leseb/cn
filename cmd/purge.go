@@ -22,7 +22,7 @@ var (
 func CliPurgeNano() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "purge",
-		Short: "Purges object storage server. DANGEROUS!",
+		Short: "Purge object storage server. DANGEROUS!",
 		Args:  cobra.NoArgs,
 		Run:   purgeNano,
 		DisableFlagsInUseLine: false,

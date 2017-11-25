@@ -13,7 +13,7 @@ import (
 func CliRestartNano() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "restart",
-		Short: "Restarts object storage server",
+		Short: "Restart object storage server",
 		Args:  cobra.NoArgs,
 		Run:   restartNano,
 	}

@@ -38,11 +38,14 @@ func CliS3CmdGet() *cobra.Command {
 
 // S3CmdGet wraps s3cmd command in the container
 func S3CmdGet(cmd *cobra.Command, args []string) {
+	if status := containerStatus(false, "running"); !status {
+		fmt.Println("ceph-nano does not exist yet!")
+		os.Exit(1)
+	}
 	if status := containerStatus(true, "exited"); status {
 		fmt.Println("ceph-nano is not running!")
 		os.Exit(1)
 	}
-
 	if S3CmdForce {
 		S3CmdOpt = "--force"
 	} else if S3CmdSkip {
