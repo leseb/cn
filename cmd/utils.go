@@ -293,21 +293,13 @@ func echoInfo() {
 	// Get the working directory
 	dir := dockerInspect()
 
-	InfoLine := "\n" +
-		strings.TrimSpace(string(c)) +
-		" is the Ceph status. \n" +
-		"S3 object server address is: http://" + ips[0].String() + ":8000 \n" +
-		"S3 user is: nano \n" +
-		"S3 access key is: " +
-		CephNanoAccessKey +
-		"\n" +
-		"S3 secret key is: " +
-		CephNanoSecretKey +
-		"\n" +
-		"Your working directory is: " +
-		dir +
-		"\n" +
-		""
+	InfoLine :=
+		"\n" + strings.TrimSpace(string(c)) + " is the Ceph status \n" +
+			"S3 object server address is: http://" + ips[0].String() + ":8000 \n" +
+			"S3 user is: nano \n" +
+			"S3 access key is: " + CephNanoAccessKey + "\n" +
+			"S3 secret key is: " + CephNanoSecretKey + "\n" +
+			"Your working directory is: " + dir + "\n"
 	fmt.Println(InfoLine)
 }
 
