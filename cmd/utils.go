@@ -353,7 +353,10 @@ func inspectImage() map[string]string {
 	}
 	i, _, err := cli.ImageInspectWithRaw(ctx, ImageName)
 	if err != nil {
-		panic(err)
+		var m map[string]string
+		m = make(map[string]string)
+		m["head"] = "unknown"
+		return m
 	}
 	return i.Config.Labels
 }
