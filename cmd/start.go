@@ -59,6 +59,8 @@ func runContainer(cmd *cobra.Command, args []string) {
 		panic(err)
 	}
 
+	pullImage()
+
 	exposedPorts, portBindings, _ := nat.ParsePortSpecs([]string{":8000:8000"})
 	envs := []string{
 		"DEBUG=verbose",
