@@ -126,10 +126,11 @@ func runContainer(cmd *cobra.Command, args []string) {
 	if err != nil {
 		if strings.Contains(err.Error(), "Mounts denied") {
 			fmt.Println("ERROR: It looks like you need to use the --work-dir option. \n" +
-				"This typically happens when Docker does not run natively (e.g: Docker for Mac/Windows). \n" +
+				"This typically happens when Docker is not running natively (e.g: Docker for Mac/Windows). \n" +
 				"The path /usr/share/ceph-nano is not shared from OS X / Windows and is not known to Docker. \n" +
 				"You can configure shared paths from Docker -> Preferences... -> File Sharing.) \n" +
-				"Alternatively you can sim")
+				"Alternatively, you can simply use the --work-dir option to point to an already shared directory. \n" +
+				"On Docker for Mac / Windows, shared directories can be found in the settings.")
 			cmd.Help()
 			os.Exit(1)
 		} else {

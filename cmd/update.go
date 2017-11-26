@@ -31,40 +31,42 @@ func updateNano(cmd *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	events, err := cli.ImagePull(ctx, ImageName, types.ImagePullOptions{})
-	if err != nil {
-		panic(err)
-	}
-
-	d := json.NewDecoder(events)
-
-	type Event struct {
-		Status         string `json:"status"`
-		Error          string `json:"error"`
-		Progress       string `json:"progress"`
-		ProgressDetail struct {
-			Current int `json:"current"`
-			Total   int `json:"total"`
-		} `json:"progressDetail"`
-	}
-
-	var event *Event
-	for {
-		if err := d.Decode(&event); err != nil {
-			if err == io.EOF {
-				break
-			}
+	if !pullImage() {
+		events, err := cli.ImagePull(ctx, ImageName, types.ImagePullOptions{})
+		if err != nil {
 			panic(err)
 		}
-	}
 
-	if event != nil {
-		if strings.Contains(event.Status, fmt.Sprintf("Downloaded newer image for %s", ImageName)) {
-			fmt.Println("New image downloaded.")
+		d := json.NewDecoder(events)
+
+		type Event struct {
+			Status         string `json:"status"`
+			Error          string `json:"error"`
+			Progress       string `json:"progress"`
+			ProgressDetail struct {
+				Current int `json:"current"`
+				Total   int `json:"total"`
+			} `json:"progressDetail"`
 		}
 
-		if strings.Contains(event.Status, fmt.Sprintf("Image is up to date for %s", ImageName)) {
-			fmt.Println("Image is up to date.")
+		var event *Event
+		for {
+			if err := d.Decode(&event); err != nil {
+				if err == io.EOF {
+					break
+				}
+				panic(err)
+			}
+		}
+
+		if event != nil {
+			if strings.Contains(event.Status, fmt.Sprintf("Downloaded newer image for %s", ImageName)) {
+				fmt.Println("New image downloaded.")
+			}
+
+			if strings.Contains(event.Status, fmt.Sprintf("Image is up to date for %s", ImageName)) {
+				fmt.Println("Image is up to date.")
+			}
 		}
 	}
 }
