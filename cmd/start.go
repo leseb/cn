@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"bufio"
-	"bytes"
 	"fmt"
 	"os"
 	"strings"
@@ -59,32 +57,6 @@ func runContainer(cmd *cobra.Command, args []string) {
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		panic(err)
-	}
-
-	_, _, err = cli.ImageInspectWithRaw(ctx, ImageName)
-	if err != nil {
-		fmt.Print("The container image is not present, pulling it. \n" +
-			"This operation can take a few minutes.")
-
-		out, err := cli.ImagePull(ctx, ImageName, types.ImagePullOptions{})
-		if err != nil {
-			panic(err)
-		}
-
-		reader := bufio.NewReader(out)
-		defer out.Close() // pullResp is io.ReadCloser
-		var respo bytes.Buffer
-		for {
-			line, err := reader.ReadBytes('\n')
-			if err != nil {
-				// it could be EOF or read error
-				break
-			}
-			respo.Write(line)
-			respo.WriteByte('\n')
-			fmt.Print(".")
-		}
-		fmt.Println("")
 	}
 
 	exposedPorts, portBindings, _ := nat.ParsePortSpecs([]string{":8000:8000"})

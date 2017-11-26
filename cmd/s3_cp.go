@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -23,10 +22,7 @@ func CliS3CmdCp() *cobra.Command {
 func S3CmdCp(cmd *cobra.Command, args []string) {
 	notExistCheck()
 	notRunningCheck()
-	if status := containerStatus(true, "exited"); status {
-		fmt.Println("ceph-nano is not running!")
-		os.Exit(1)
-	}
+
 	command := []string{"s3cmd", "cp", "s3://" + args[0], "s3://" + args[1]}
 	output := execContainer(ContainerName, command)
 	fmt.Printf("%s", output)
