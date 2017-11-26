@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -24,10 +23,7 @@ func logsNano(cmd *cobra.Command, args []string) {
 }
 
 func showS3Logs() {
-	if status := containerStatus(false, "running"); !status {
-		fmt.Println("ceph-nano does not exist yet!")
-		os.Exit(1)
-	}
+	notExistCheck()
 	c := []string{"cat", "/var/log/ceph/client.rgw.ceph-nano-faa32aebf00b.log"}
 	output := execContainer(ContainerName, c)
 	fmt.Printf("%s", output)

@@ -25,14 +25,8 @@ If you wan to upload a file that is in a directory withing your working director
 
 // S3CmdPut wraps s3cmd command in the container
 func S3CmdPut(cmd *cobra.Command, args []string) {
-	if status := containerStatus(false, "running"); !status {
-		fmt.Println("ceph-nano does not exist yet!")
-		os.Exit(1)
-	}
-	if status := containerStatus(true, "exited"); status {
-		fmt.Println("ceph-nano is not running!")
-		os.Exit(1)
-	}
+	notExistCheck()
+	notRunningCheck()
 	dir := dockerInspect()
 	if _, err := os.Stat(dir + "/" + args[0]); os.IsNotExist(err) {
 		fmt.Printf("ERROR: input file '%s' does NOT exit in your working directory %s. \n"+

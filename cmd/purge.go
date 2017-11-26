@@ -40,10 +40,7 @@ func purgeNano(cmd *cobra.Command, args []string) {
 		cmd.Help()
 		os.Exit(1)
 	}
-	if status := containerStatus(false, "running"); !status {
-		fmt.Println("ceph-nano does not exist yet!")
-		os.Exit(1)
-	}
+	notExistCheck()
 	fmt.Println("Purging ceph-nano... ")
 	removeContainer(ContainerName)
 }

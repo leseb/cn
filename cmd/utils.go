@@ -401,3 +401,17 @@ func pullImage() bool {
 	}
 	return false
 }
+
+func notExistCheck() {
+	if status := containerStatus(false, "running"); !status {
+		fmt.Println("ceph-nano does not exist yet.")
+		os.Exit(1)
+	}
+}
+
+func notRunningCheck() {
+	if status := containerStatus(true, "exited"); status {
+		fmt.Println("ceph-nano is not running.")
+		os.Exit(1)
+	}
+}

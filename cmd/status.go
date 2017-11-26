@@ -1,9 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 	"github.com/spf13/cobra"
@@ -23,10 +20,7 @@ func CliStatusNano() *cobra.Command {
 
 // statusNano shows Ceph Nano status
 func statusNano(cmd *cobra.Command, args []string) {
-	if status := containerStatus(false, "running"); !status {
-		fmt.Println("ceph-nano is not running!")
-		os.Exit(1)
-	}
+	notRunningCheck()
 	echoInfo()
 }
 

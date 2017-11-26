@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -21,14 +20,8 @@ func CliS3CmdMv() *cobra.Command {
 
 // S3CmdMv wraps s3cmd command in the container
 func S3CmdMv(cmd *cobra.Command, args []string) {
-	if status := containerStatus(false, "running"); !status {
-		fmt.Println("ceph-nano does not exist yet!")
-		os.Exit(1)
-	}
-	if status := containerStatus(true, "exited"); status {
-		fmt.Println("ceph-nano is not running!")
-		os.Exit(1)
-	}
+	notExistCheck()
+	notRunningCheck()
 	command := []string{"s3cmd", "mv", "s3://" + args[0], "s3://" + args[1]}
 	output := execContainer(ContainerName, command)
 	fmt.Printf("%s", output)

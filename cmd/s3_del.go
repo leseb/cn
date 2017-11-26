@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -29,14 +28,8 @@ func CliS3CmdDel() *cobra.Command {
 
 // S3CmdDel wraps s3cmd command in the container
 func S3CmdDel(cmd *cobra.Command, args []string) {
-	if status := containerStatus(false, "running"); !status {
-		fmt.Println("ceph-nano does not exist yet!")
-		os.Exit(1)
-	}
-	if status := containerStatus(true, "exited"); status {
-		fmt.Println("ceph-nano is not running!")
-		os.Exit(1)
-	}
+	notExistCheck()
+	notRunningCheck()
 
 	/*
 		S3CmdOpt = "--verbose"
