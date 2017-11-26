@@ -20,6 +20,7 @@ func CliStatusNano() *cobra.Command {
 
 // statusNano shows Ceph Nano status
 func statusNano(cmd *cobra.Command, args []string) {
+	notExistCheck()
 	notRunningCheck()
 	echoInfo()
 }
