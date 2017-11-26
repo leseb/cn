@@ -28,6 +28,9 @@ var (
 	// ContainerName is name of the container
 	ContainerName = "ceph-nano"
 
+	// ImageName is the name of the container image
+	ImageName = "ceph/daemon"
+
 	rootCmd = &cobra.Command{
 		Use:        cliName,
 		Short:      cliDescription,
@@ -55,6 +58,7 @@ func init() {
 		CliLogsNano(),
 		CliRestartNano(),
 		cmdS3,
+		CliUpdateNano(),
 		CliVersionNano(),
 	)
 }

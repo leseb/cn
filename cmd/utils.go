@@ -350,3 +350,17 @@ func dockerInspect() string {
 	parts := strings.Split(inspect.HostConfig.Binds[0], ":")
 	return parts[0]
 }
+
+// inspectImage inspect a given image
+func inspectImage() map[string]string {
+	ctx := context.Background()
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		panic(err)
+	}
+	i, _, err := cli.ImageInspectWithRaw(ctx, ImageName)
+	if err != nil {
+		panic(err)
+	}
+	return i.Config.Labels
+}

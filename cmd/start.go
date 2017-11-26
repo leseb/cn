@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 	"strings"
@@ -59,12 +61,31 @@ func runContainer(cmd *cobra.Command, args []string) {
 		panic(err)
 	}
 
-	imageName := "ceph/daemon"
-	out, err := cli.ImagePull(ctx, imageName, types.ImagePullOptions{})
+	_, _, err = cli.ImageInspectWithRaw(ctx, ImageName)
 	if err != nil {
-		panic(err)
+		fmt.Print("The container image is not present, pulling it. \n" +
+			"This operation can take a few minutes.")
+
+		out, err := cli.ImagePull(ctx, ImageName, types.ImagePullOptions{})
+		if err != nil {
+			panic(err)
+		}
+
+		reader := bufio.NewReader(out)
+		defer out.Close() // pullResp is io.ReadCloser
+		var respo bytes.Buffer
+		for {
+			line, err := reader.ReadBytes('\n')
+			if err != nil {
+				// it could be EOF or read error
+				break
+			}
+			respo.Write(line)
+			respo.WriteByte('\n')
+			fmt.Print(".")
+		}
+		fmt.Println("")
 	}
-	defer out.Close()
 
 	exposedPorts, portBindings, _ := nat.ParsePortSpecs([]string{":8000:8000"})
 	envs := []string{
@@ -76,7 +97,7 @@ func runContainer(cmd *cobra.Command, args []string) {
 		"CEPH_DAEMON=demo"}
 
 	config := &container.Config{
-		Image:        imageName,
+		Image:        ImageName,
 		Hostname:     ContainerName + "-faa32aebf00b",
 		ExposedPorts: exposedPorts,
 		Env:          envs,
@@ -104,7 +125,11 @@ func runContainer(cmd *cobra.Command, args []string) {
 	//[signal SIGSEGV: segmentation violation code=0x1 addr=0x20 pc=0x137a2b4]
 	if err != nil {
 		if strings.Contains(err.Error(), "Mounts denied") {
-			fmt.Println("ERROR: It looks like you need to use the --work-dir option.")
+			fmt.Println("ERROR: It looks like you need to use the --work-dir option. \n" +
+				"This typically happens when Docker does not run natively (e.g: Docker for Mac/Windows). \n" +
+				"The path /usr/share/ceph-nano is not shared from OS X / Windows and is not known to Docker. \n" +
+				"You can configure shared paths from Docker -> Preferences... -> File Sharing.) \n" +
+				"Alternatively you can sim")
 			cmd.Help()
 			os.Exit(1)
 		} else {
