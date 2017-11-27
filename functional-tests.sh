@@ -155,7 +155,7 @@ function s3_put {
     cat "$err_file"
     exit 1
   fi
-  rm -f "$err_file"
+  rm -f "$err_file" /tmp/ooo
 }
 
 function s3_get {
@@ -168,7 +168,7 @@ function s3_get {
     cat "$err_file"
     exit 1
   fi
-  rm -f "$err_file"
+  rm -f "$err_file" /tmp/iii
 }
 
 function s3_ls {
