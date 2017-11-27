@@ -2,7 +2,7 @@ package cmd
 
 import (
 	"fmt"
-	"os"
+	"log"
 
 	"github.com/spf13/cobra"
 )
@@ -23,23 +23,23 @@ func CliS3CmdSync() *cobra.Command {
 func S3CmdSync(cmd *cobra.Command, args []string) {
 	notExistCheck()
 	notRunningCheck()
+	localDir := args[0]
+	bucketName := args[1]
 	dir := dockerInspect()
-	if args[0] == dir {
-		args[0] = dir
-	} else {
-		args[0] = dir + "/" + args[0]
-		if _, err := os.Stat(args[0]); os.IsNotExist(err) {
-			fmt.Printf("ERROR: input directory '%s' does NOT exit in your working directory %s. \n"+
-				"Try to change directory to your working directory.\n \n", args[0], dir)
-			cmd.Help()
-			os.Exit(1)
+	destDir := "/tmp"
+
+	if localDir != dir {
+		destDir = dir + "/" + localDir
+		err := copyDir(localDir, destDir)
+		if err != nil {
+			log.Fatal(err)
 		}
 	}
 	fmt.Printf("Syncing directory '%s' in the '%s' bucket. \n"+
 		"It might take some time depending on the amount of data. \n"+
-		"Do not expect any output until the upload is finished. \n \n", args[0], args[1])
+		"Do not expect any output until the upload is finished. \n \n", localDir, bucketName)
 
-	command := []string{"s3cmd", "sync", args[0], "s3://" + args[1]}
+	command := []string{"s3cmd", "sync", destDir, "s3://" + bucketName}
 	output := execContainer(ContainerName, command)
 	fmt.Printf("%s", output)
 }

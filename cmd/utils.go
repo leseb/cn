@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -444,4 +445,62 @@ func copyFile(srcName, dstName string) (int64, error) {
 	}
 
 	return numBytesWritten, nil
+}
+
+// copyDir recursively copies a directory tree, attempting to preserve permissions.
+// Source directory must exist, destination directory must *not* exist.
+// Symlinks are ignored and skipped.
+func copyDir(src string, dst string) (err error) {
+	src = filepath.Clean(src)
+	dst = filepath.Clean(dst)
+
+	si, err := os.Stat(src)
+	if err != nil {
+		return errors.New("Error can not stat source. Caused by: " + err.Error())
+	}
+	if !si.IsDir() {
+		return errors.New("source is not a directory")
+	}
+
+	_, err = os.Stat(dst)
+	if err != nil && !os.IsNotExist(err) {
+		return errors.New("Error can not stat destination. Caused by: " + err.Error())
+	}
+	if err == nil {
+		return fmt.Errorf("destination already exists")
+	}
+
+	err = os.MkdirAll(dst, si.Mode())
+	if err != nil {
+		return errors.New("Error can not create directories. Caused by: " + err.Error())
+	}
+
+	entries, err := ioutil.ReadDir(src)
+	if err != nil {
+		return errors.New("Error can not read directories. Caused by: " + err.Error())
+	}
+
+	for _, entry := range entries {
+		srcPath := filepath.Join(src, entry.Name())
+		dstPath := filepath.Join(dst, entry.Name())
+
+		if entry.IsDir() {
+			err = copyDir(srcPath, dstPath)
+			if err != nil {
+				return errors.New("Error copying directory. Caused by: " + err.Error())
+			}
+		} else {
+			// Skip symlinks.
+			if entry.Mode()&os.ModeSymlink != 0 {
+				continue
+			}
+
+			_, err = copyFile(srcPath, dstPath)
+			if err != nil {
+				return errors.New("Error copying file. Caused by: " + err.Error())
+			}
+		}
+	}
+
+	return nil
 }
