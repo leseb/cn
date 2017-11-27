@@ -2,6 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"log"
+	"os"
+	"path"
 
 	"github.com/spf13/cobra"
 )
@@ -20,9 +23,9 @@ var (
 // CliS3CmdGet is the Cobra CLI call
 func CliS3CmdGet() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "get BUCKET/OBJECT LOCAL_FILE",
+		Use:   "get BUCKET/OBJECT [LOCAL_FILE]",
 		Short: "Get file into bucket",
-		Args:  cobra.RangeArgs(2, 3),
+		Args:  cobra.RangeArgs(1, 2),
 		Run:   S3CmdGet,
 		DisableFlagsInUseLine: false,
 	}
@@ -39,6 +42,17 @@ func CliS3CmdGet() *cobra.Command {
 func S3CmdGet(cmd *cobra.Command, args []string) {
 	notExistCheck()
 	notRunningCheck()
+	BucketObjectName := args[0]
+	var fileName string
+
+	if len(args) > 1 {
+		fileName = args[1]
+	} else {
+		fileName = BucketObjectName
+	}
+
+	BucketObjectNameBase := path.Base(BucketObjectName)
+
 	if S3CmdForce {
 		S3CmdOpt = "--force"
 	} else if S3CmdSkip {
@@ -46,7 +60,22 @@ func S3CmdGet(cmd *cobra.Command, args []string) {
 	} else if S3CmdContinue {
 		S3CmdOpt = "--continue"
 	}
-	command := []string{"s3cmd", "get", S3CmdOpt, "s3://" + args[0], "/tmp/" + args[1]}
+	// if args
+	command := []string{"s3cmd", "get", S3CmdOpt, "s3://" + BucketObjectName, "/tmp/"}
 	output := execContainer(ContainerName, command)
+
+	dir := dockerInspect()
+	if fileName != BucketObjectName {
+		//if _, err := os.Stat(fileName); os.Stat.Mode.IsDir(err) {
+		if info, err := os.Stat(fileName); err == nil && info.IsDir() {
+			fileName = fileName + "/" + BucketObjectNameBase
+		}
+		_, err := copyFile(dir+"/"+BucketObjectNameBase, fileName)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+	}
+
 	fmt.Printf("%s", output)
 }

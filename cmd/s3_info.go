@@ -9,7 +9,7 @@ import (
 // CliS3CmdInfo is the Cobra CLI call
 func CliS3CmdInfo() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "info BUCKET[/OBJECT]",
+		Use:   "info BUCKET/OBJECT",
 		Short: "Get various information about Buckets or Files",
 		Args:  cobra.ExactArgs(1),
 		Run:   S3CmdInfo,

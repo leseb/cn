@@ -9,7 +9,7 @@ import (
 // CliS3CmdDu is the Cobra CLI call
 func CliS3CmdDu() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "du [BUCKET[/PREFIX]]",
+		Use:   "du BUCKET/PREFIX",
 		Short: "Disk usage by buckets",
 		Args:  cobra.ExactArgs(1),
 		Run:   S3CmdDu,

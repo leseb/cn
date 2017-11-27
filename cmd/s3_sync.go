@@ -10,7 +10,7 @@ import (
 // CliS3CmdSync is the Cobra CLI call
 func CliS3CmdSync() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "sync LOCAL_DIR BUCKET[/PREFIX]",
+		Use:   "sync LOCAL_DIR BUCKET",
 		Short: "Synchronize a directory tree to S3",
 		Args:  cobra.ExactArgs(2),
 		Run:   S3CmdSync,

@@ -5,7 +5,9 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -409,4 +411,37 @@ func notRunningCheck() {
 		fmt.Println("ceph-nano is not running.")
 		os.Exit(0)
 	}
+}
+
+func copyFile(srcName, dstName string) (int64, error) {
+	src, e := os.Open(srcName)
+	if e != nil {
+		return 0, errors.New("Error while opening file for reading. Caused by: " + e.Error())
+	}
+
+	dst, e := os.Create(dstName)
+	if e != nil {
+		src.Close()
+		return 0, errors.New("Error while opening file for writing. Caused by: " + e.Error())
+	}
+
+	numBytesWritten, e := io.Copy(dst, src)
+	if e != nil {
+		dst.Close()
+		src.Close()
+		return 0, errors.New("Error while copying. Caused by: " + e.Error())
+	}
+
+	e = dst.Close()
+	if e != nil {
+		src.Close()
+		return numBytesWritten, errors.New("Error while closing. Caused by: " + e.Error())
+	}
+
+	e = src.Close()
+	if e != nil {
+		return numBytesWritten, errors.New("Error while closing. Caused by: " + e.Error())
+	}
+
+	return numBytesWritten, nil
 }

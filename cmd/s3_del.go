@@ -14,7 +14,7 @@ var (
 // CliS3CmdDel is the Cobra CLI call
 func CliS3CmdDel() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "del [BUCKET]/OBJECT",
+		Use:   "del BUCKET/OBJECT",
 		Short: "Delete bucket",
 		Args:  cobra.ExactArgs(1),
 		Run:   S3CmdDel,
